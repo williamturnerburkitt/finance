@@ -4,6 +4,8 @@ import logging
 from datetime import datetime
 import pandas as pd
 
+from constants.columns import AMOUNT, COUNTERPARTY, OPERATION, EXPENSE_DATE
+
 
 class Transactions:
     
@@ -21,9 +23,9 @@ class Transactions:
     @staticmethod
     def preprocess(df: pd.DataFrame) -> pd.DataFrame:
         df.columns = df.columns.str.lower()
-        df['bedrag'] = [amount.replace(',', '.') for amount in df.bedrag]
-        df['operatie'] = ['-' if '-' in amount else '+' for amount in df.bedrag]
-        return df[['valutadatum', 'naam tegenpartij bevat', 'bedrag', 'operatie']]
+        df[AMOUNT] = [amount.replace(',', '.') for amount in df.bedrag]
+        df[OPERATION] = ['-' if '-' in amount else '+' for amount in df.bedrag]
+        return df[[EXPENSE_DATE, COUNTERPARTY, AMOUNT, OPERATION]]
     
     def split_up_date(self, df: pd.DataFrame) -> pd.DataFrame:
         df['valutadatum'] = self.to_datetime_format(df, 'valutadatum')
