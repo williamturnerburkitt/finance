@@ -45,14 +45,14 @@ class Transactions:
         return f'output/{self.account}/{latest_date}'
 
     @staticmethod
-    def write_output(df: pd.DataFrame, output_path: str, file_name: str) -> pd.DataFrame:
+    def write_output(df: pd.DataFrame, output_path: str, file_name: str) -> None:
         if not os.path.exists(output_path):
             os.mkdir(output_path)
         df.to_excel(f'{output_path}/{file_name}')
         logging.info(f'Wrote {df.count()} records to {output_path}.')
     
     @staticmethod
-    def to_datetime_format(df: pd.DataFrame, col: str, time_format: str = '%d/%m/%Y') -> pd.DataFrame:
+    def to_datetime_format(df: pd.DataFrame, col: str, time_format: str = '%d/%m/%Y') -> list:
         return [datetime.strptime(value[0], time_format) for value in df[[col]].values.tolist()]
 
 
