@@ -1,0 +1,5 @@
+home_dir = '~/Library/Mobile\ Documents/com~apple~CloudDocs/finance/'
+private = 'william/'
+relation = 'lisa_william'
+date = 'YYYY-MM/'
+input = 'input.csv'
