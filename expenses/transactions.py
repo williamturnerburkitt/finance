@@ -5,7 +5,7 @@ from datetime import datetime
 import pandas as pd
 
 from constants.columns import AMOUNT, COUNTERPARTY, OPERATION, EXPENSE_DATE
-
+from constants.drive import HOME, PRIVATE, RELATION, YEAR_MONTH, INPUT
 
 class Transactions:
     
