@@ -60,21 +60,21 @@ class Transactions:
         return [datetime.strptime(value[0], time_format) for value in df[[col]].values.tolist()]
 
 
-def main(account, date):
-    transactions = Transactions(account, date)
+def main(relation, year_month):
+    transactions = Transactions(relation, year_month)
 
     df = transactions.read_input(transactions.input_path, 'input.csv', ';')
     df = transactions.preprocess(df)
     df = transactions.split_up_date(df)
     df = transactions.filter_on_month_of_interest(df)
     output_path = transactions.get_output_path(df)
-    transactions.write_output(df, output_path, f'{date}_output.xlsx')
+    transactions.write_output(df, output_path, f'{year_month}_output.xlsx')
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Script to update transactions')
-    parser.add_argument('--account')
-    parser.add_argument('--date')
+    parser.add_argument('--relation')
+    parser.add_argument('--year_month')
     args = parser.parse_args()
-    main(account=args.account, date=args.date)
+    main(account=args.relation, date=args.year_month)
     logging.info('Done')
