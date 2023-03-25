@@ -7,6 +7,7 @@ import pandas as pd
 from constants.columns import AMOUNT, COUNTERPARTY, OPERATION, EXPENSE_DATE
 from constants.drive import HOME, PRIVATE, RELATION, YEAR_MONTH, INPUT
 
+
 class Transactions:
     
     def __init__(self, account: str, date_of_interest: str):
