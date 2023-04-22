@@ -18,10 +18,10 @@ class Transactions:
     def __init__(self, household: str, year_month: str):
         self.household = household
         self.year_month = year_month
-        self.path = f'{HOME}/{self.household}/{self.year_month}'
+        self.path = f'../{HOME}/{self.household}/{self.year_month}'
 
     def read_input(self, file_name: str, delimiter: str = ';') -> list:
-        with open(f'../{self.path}/{file_name}') as transactions:
+        with open(f'{self.path}/{file_name}') as transactions:
             self.ignore_useless_data(transactions)
             csv_reader = csv.DictReader(self.lowercase_header(transactions), delimiter=delimiter)
             result = []
