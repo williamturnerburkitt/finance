@@ -1,5 +1,6 @@
 import argparse
 import io
+import itertools
 import os
 import logging
 import csv
@@ -19,14 +20,22 @@ class Transactions:
         self.year_month = year_month
         self.path = f'{HOME}/{self.household}/{self.year_month}'
 
-    def read_input(self, file_name: str, delimiter: str = ';') -> None:
+    def read_input(self, file_name: str, delimiter: str = ';') -> list:
         with open(f'../{self.path}/{file_name}') as transactions:
             self.ignore_useless_data(transactions)
-            csv_reader = csv.DictReader(transactions, delimiter=delimiter)
+            csv_reader = csv.DictReader(self.lowercase_header(transactions), delimiter=delimiter)
+            result = []
             for row in csv_reader:
-                print(row)
-        logging.info(f'Read records from {self.path}.')
-        return None
+                result.append(
+                    {
+                        AMOUNT: row[AMOUNT],
+                        EXPENSE_DATE: row[EXPENSE_DATE],
+                        COUNTERPARTY: row[COUNTERPARTY],
+                        CURRENCY_DATE: row[CURRENCY_DATE]
+                    }
+                )
+        logging.info(f'Number of transactions read: {len(result)}.')
+        return result
     
     @staticmethod
     def preprocess(df):
@@ -74,6 +83,10 @@ class Transactions:
             line = transactions.readline()
             if line == ';\n':
                 useless_data = False
+
+    @staticmethod
+    def lowercase_header(iterator):
+        return itertools.chain([next(iterator).lower()], iterator)
 
 
 def main(
