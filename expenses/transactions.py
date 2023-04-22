@@ -6,11 +6,10 @@ import csv
 import typing
 
 import arrow
-from pathlib import Path
 
 from constants.columns import AMOUNT, COUNTERPARTY, OPERATION, EXPENSE_DATE, CURRENCY_DATE, YEAR, MONTH, DAY, \
     LATEST_MONTH
-from constants.drive import HOME, FAMILY, YEAR_MONTH, FILE_NAME
+from constants.drive import HOME, FAMILY, FILE_NAME
 
 
 class Transactions:
@@ -18,10 +17,10 @@ class Transactions:
     def __init__(self, household: str, year_month: str):
         self.household = household
         self.year_month = year_month
-        self.path = f'{HOME}/{self.household}'
+        self.path = f'{HOME}/{self.household}/{self.year_month}'
 
     def read_input(self, file_name: str, delimiter: str = ';') -> None:
-        with open(f'../{self.path}/{self.year_month}/{file_name}') as transactions:
+        with open(f'../{self.path}/{file_name}') as transactions:
 
             self.ignore_useless_data(transactions)
             csv_reader = csv.DictReader(transactions, delimiter=delimiter)
