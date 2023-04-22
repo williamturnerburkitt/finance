@@ -1,4 +1,4 @@
-HOME = '~/Library/Mobile Documents/com~apple~CloudDocs/finance'
+HOME = 'data'
 FAMILY = 'lisa_william'
 YEAR_MONTH = 'YYYYMM'
 FILE_NAME = 'input.csv'

@@ -1,8 +1,12 @@
 import argparse
+import io
 import os
 import logging
 import csv
+import typing
+
 import arrow
+from pathlib import Path
 
 from constants.columns import AMOUNT, COUNTERPARTY, OPERATION, EXPENSE_DATE, CURRENCY_DATE, YEAR, MONTH, DAY, \
     LATEST_MONTH
@@ -17,10 +21,11 @@ class Transactions:
         self.path = f'{HOME}/{self.household}'
 
     def read_input(self, file_name: str, delimiter: str = ';') -> None:
-        # with open(f'{self.path}/{self.year_month}/{file_name}') as csv_file:
-        with open('~Library/Mobile Documents/com~apple~CloudDocs/finance/lisa_william/2022-11/input.csv') as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=delimiter)
-            for row in enumerate(csv_reader):
+        with open(f'../{self.path}/{self.year_month}/{file_name}') as transactions:
+
+            self.ignore_useless_data(transactions)
+            csv_reader = csv.DictReader(transactions, delimiter=delimiter)
+            for row in csv_reader:
                 print(row)
         logging.info(f'Read records from {self.path}.')
         return None
@@ -63,6 +68,14 @@ class Transactions:
     # @staticmethod
     # def to_datetime_format(df: pd.DataFrame, col: str, time_format: str = '%d/%m/%Y') -> list:
     #     return [datetime.strptime(value[0], time_format) for value in df[[col]].values.tolist()]
+
+    @staticmethod
+    def ignore_useless_data(transactions: typing.TextIO) -> None:
+        useless_data = True
+        while useless_data:
+            line = transactions.readline()
+            if line == ';\n':
+                useless_data = False
 
 
 def main(
