@@ -21,7 +21,6 @@ class Transactions:
 
     def read_input(self, file_name: str, delimiter: str = ';') -> None:
         with open(f'../{self.path}/{file_name}') as transactions:
-
             self.ignore_useless_data(transactions)
             csv_reader = csv.DictReader(transactions, delimiter=delimiter)
             for row in csv_reader:
