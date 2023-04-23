@@ -74,7 +74,7 @@ def main(
         year_month=year_month,
         file_name=file_name
     )
-    df = reader.read_input(
+    df = reader.read(
         path=f'{transactions.path}/{transactions.file_name}',
         columns=transactions.COLUMNS
     )
