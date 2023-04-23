@@ -1,12 +1,11 @@
 import argparse
+import arrow
+from collections import defaultdict
 import os
 import logging
-from collections import defaultdict
-
-import arrow
 
 from constants.columns import AMOUNT, COUNTERPARTY, OPERATION, EXPENSE_DATE, CURRENCY_DATE, YEAR, MONTH, DAY, \
-    LATEST_MONTH
+    LATEST_MONTH, DDMMYY
 from constants.drive import HOME, FAMILY, FILE_NAME
 from helper.csv_reader import CsvReader
 from expenses.transformer import Transformer
@@ -27,13 +26,17 @@ class BelfiusTransformer(Transformer):
         self.path = f'../{HOME}/{self.household}/{self.year_month}'
 
     @staticmethod
-    def preprocess(rows: list[dict]) -> defaultdict:
+    def transform(rows: list[dict]) -> defaultdict:
         d = defaultdict(list)
         for row in rows:
+            currency_date = arrow.get(row[CURRENCY_DATE], DDMMYY)
+
             d[AMOUNT].append(row[AMOUNT].replace(',', '.'))
             d[EXPENSE_DATE].append(row[EXPENSE_DATE])
+            d[YEAR].append(currency_date.year)
+            d[MONTH].append(currency_date.month)
+            d[DAY].append(currency_date.day)
             d[COUNTERPARTY].append(row[COUNTERPARTY])
-            d[CURRENCY_DATE].append(row[CURRENCY_DATE])
             d[OPERATION].append('-' if '-' in row[AMOUNT] else '+')
         return d
 
@@ -85,7 +88,7 @@ def main(
         path=f'{transformer.path}/{transformer.file_name}',
         columns=transformer.COLUMNS
     )
-    lod = transformer.preprocess(lod)
+    lod = transformer.transform(lod)
     df = transactions.split_up_date(df)
     # df = transactions.filter_on_month_of_interest(df)
     # output_path = transactions.get_output_path(df)
