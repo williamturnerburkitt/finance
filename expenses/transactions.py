@@ -1,42 +1,28 @@
 import argparse
-import io
-import itertools
 import os
 import logging
-import csv
-import typing
-
 import arrow
 
 from constants.columns import AMOUNT, COUNTERPARTY, OPERATION, EXPENSE_DATE, CURRENCY_DATE, YEAR, MONTH, DAY, \
     LATEST_MONTH
 from constants.drive import HOME, FAMILY, FILE_NAME
+from helper.reader import CsvReader
 
 
 class Transactions:
+    COLUMNS = [AMOUNT, EXPENSE_DATE, COUNTERPARTY, CURRENCY_DATE]
 
-    def __init__(self, household: str, year_month: str):
+    def __init__(
+            self,
+            household: str,
+            year_month: str,
+            file_name: str
+    ):
+        self.file_name = file_name
         self.household = household
         self.year_month = year_month
         self.path = f'../{HOME}/{self.household}/{self.year_month}'
 
-    def read_input(self, file_name: str, delimiter: str = ';') -> list:
-        with open(f'{self.path}/{file_name}') as transactions:
-            self.ignore_useless_data(transactions)
-            csv_reader = csv.DictReader(self.lowercase_header(transactions), delimiter=delimiter)
-            result = []
-            for row in csv_reader:
-                result.append(
-                    {
-                        AMOUNT: row[AMOUNT],
-                        EXPENSE_DATE: row[EXPENSE_DATE],
-                        COUNTERPARTY: row[COUNTERPARTY],
-                        CURRENCY_DATE: row[CURRENCY_DATE]
-                    }
-                )
-        logging.info(f'Number of transactions read: {len(result)}.')
-        return result
-    
     @staticmethod
     def preprocess(df):
         df.columns = df.columns.str.lower()
@@ -76,27 +62,23 @@ class Transactions:
     # def to_datetime_format(df: pd.DataFrame, col: str, time_format: str = '%d/%m/%Y') -> list:
     #     return [datetime.strptime(value[0], time_format) for value in df[[col]].values.tolist()]
 
-    @staticmethod
-    def ignore_useless_data(transactions: typing.TextIO) -> None:
-        useless_data = True
-        while useless_data:
-            line = transactions.readline()
-            if line == ';\n':
-                useless_data = False
-
-    @staticmethod
-    def lowercase_header(iterator):
-        return itertools.chain([next(iterator).lower()], iterator)
-
 
 def main(
         year_month: str,
         household: str,
         file_name: str
 ) -> None:
-    transactions = Transactions(household=household, year_month=year_month)
-    df = transactions.read_input(file_name=file_name)
-    # df = transactions.preprocess(df)
+    reader = CsvReader()
+    transactions = Transactions(
+        household=household,
+        year_month=year_month,
+        file_name=file_name
+    )
+    df = reader.read_input(
+        path=f'{transactions.path}/{transactions.file_name}',
+        columns=transactions.COLUMNS
+    )
+    df = transactions.preprocess(df)
     # df = transactions.split_up_date(df)
     # df = transactions.filter_on_month_of_interest(df)
     # output_path = transactions.get_output_path(df)
