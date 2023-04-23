@@ -1,15 +1,18 @@
 import argparse
 import os
 import logging
+from collections import defaultdict
+
 import arrow
 
 from constants.columns import AMOUNT, COUNTERPARTY, OPERATION, EXPENSE_DATE, CURRENCY_DATE, YEAR, MONTH, DAY, \
     LATEST_MONTH
 from constants.drive import HOME, FAMILY, FILE_NAME
 from helper.csv_reader import CsvReader
+from expenses.transformer import Transformer
 
 
-class Transactions:
+class BelfiusTransformer(Transformer):
     COLUMNS = [AMOUNT, EXPENSE_DATE, COUNTERPARTY, CURRENCY_DATE]
 
     def __init__(
@@ -24,12 +27,16 @@ class Transactions:
         self.path = f'../{HOME}/{self.household}/{self.year_month}'
 
     @staticmethod
-    def preprocess(df):
-        df.columns = df.columns.str.lower()
-        df[AMOUNT] = [amount.replace(',', '.') for amount in df.AMOUNT]
-        df[OPERATION] = ['-' if '-' in amount else '+' for amount in df.AMOUNT]
-        return df[[EXPENSE_DATE, COUNTERPARTY, AMOUNT, OPERATION]]
-    
+    def preprocess(rows: list[dict]) -> defaultdict:
+        d = defaultdict(list)
+        for row in rows:
+            d[AMOUNT].append(row[AMOUNT].replace(',', '.'))
+            d[EXPENSE_DATE].append(row[EXPENSE_DATE])
+            d[COUNTERPARTY].append(row[COUNTERPARTY])
+            d[CURRENCY_DATE].append(row[CURRENCY_DATE])
+            d[OPERATION].append('-' if '-' in row[AMOUNT] else '+')
+        return d
+
     def split_up_date(self, df):
         df[CURRENCY_DATE] = self.to_datetime_format(df, CURRENCY_DATE)
         df[YEAR] = [datum.year for datum in df[CURRENCY_DATE]]
@@ -69,17 +76,17 @@ def main(
         file_name: str
 ) -> None:
     reader = CsvReader()
-    transactions = Transactions(
+    transformer = BelfiusTransformer(
         household=household,
         year_month=year_month,
         file_name=file_name
     )
-    df = reader.read(
-        path=f'{transactions.path}/{transactions.file_name}',
-        columns=transactions.COLUMNS
+    lod = reader.read(
+        path=f'{transformer.path}/{transformer.file_name}',
+        columns=transformer.COLUMNS
     )
-    df = transactions.preprocess(df)
-    # df = transactions.split_up_date(df)
+    lod = transformer.preprocess(lod)
+    df = transactions.split_up_date(df)
     # df = transactions.filter_on_month_of_interest(df)
     # output_path = transactions.get_output_path(df)
     # transactions.write_output(df, output_path, f'{year_month}_output.xlsx')
