@@ -1,6 +1,5 @@
 import csv
 import logging
-import typing
 
 from helper.reader import Reader
 
