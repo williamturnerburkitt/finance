@@ -6,7 +6,7 @@ import arrow
 from constants.columns import AMOUNT, COUNTERPARTY, OPERATION, EXPENSE_DATE, CURRENCY_DATE, YEAR, MONTH, DAY, \
     LATEST_MONTH
 from constants.drive import HOME, FAMILY, FILE_NAME
-from helper.reader import CsvReader
+from helper.csv_reader import CsvReader
 
 
 class Transactions:
